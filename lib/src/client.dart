@@ -150,7 +150,7 @@ class Client {
     if (isClosed) throw StateError('The client is closed.');
 
     var message = <String, dynamic>{'jsonrpc': '2.0', 'method': method};
-    if (id != null) message['id'] = id;
+    if (id != null) message['id'] = id.toString();
     if (parameters != null) message['params'] = parameters;
 
     if (_batch != null) {
