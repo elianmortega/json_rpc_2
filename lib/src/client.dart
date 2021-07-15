@@ -201,8 +201,9 @@ class Client {
     if (response.containsKey('result')) {
       request.completer.complete(response['result']);
     } else {
+      // response['error']['message'],
       request.completer.completeError(
-          RpcException(response['error']['code'], response['error']['message'],
+          RpcException(response['error']['code'], response['error']['error'],
               data: response['error']['data']),
           request.chain);
     }
@@ -221,7 +222,10 @@ class Client {
     var error = response['error'];
     if (error is! Map) return false;
     if (error['code'] is! int) return false;
-    if (error['message'] is! String) return false;
+
+    // if (error['message'] is! String) return false;
+    // For hypervolt there is no `message` field only error
+    if (error['error'] is! String) return false;
     return true;
   }
 }
