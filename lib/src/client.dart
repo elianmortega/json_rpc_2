@@ -79,8 +79,11 @@ class Client {
   /// when it has an error. This is the same as [done].
   ///
   /// [listen] may only be called once.
-  Future listen() {
-    _channel.stream.listen(_handleResponse, onError: (error, stackTrace) {
+  Future listen({
+    void Function(dynamic)? onNotification,
+  }) {
+    _channel.stream.listen((data) => _handleResponse(data, onNotification),
+        onError: (error, stackTrace) {
       _done.completeError(error, stackTrace);
       _channel.sink.close();
     }, onDone: () {
@@ -183,18 +186,28 @@ class Client {
   }
 
   /// Handles a decoded response from the server.
-  void _handleResponse(response) {
+  void _handleResponse(
+    response, [
+    void Function(dynamic)? onNotification,
+  ]) {
     if (response is List) {
-      response.forEach(_handleSingleResponse);
+      response.forEach((data) => _handleSingleResponse(data, onNotification));
     } else {
-      _handleSingleResponse(response);
+      _handleSingleResponse(response, onNotification);
     }
   }
 
   /// Handles a decoded response from the server after batches have been
   /// resolved.
-  void _handleSingleResponse(response) {
+  void _handleSingleResponse(
+    response, [
+    void Function(dynamic)? onNotification,
+  ]) {
     if (!_isResponseValid(response)) return;
+    if (response.containsKey('params')) {
+      onNotification?.call(response['params']);
+      return;
+    }
     var id = response['id'];
     id = (id is String) ? int.parse(id) : id;
     var request = _pendingRequests.remove(id)!;
@@ -212,6 +225,8 @@ class Client {
   /// Determines whether the server's response is valid per the spec.
   bool _isResponseValid(response) {
     if (response is! Map) return false;
+    // If params is included is a notification response
+    if (response.containsKey('params')) return true;
     if (response['jsonrpc'] != '2.0') return false;
     var id = response['id'];
     id = (id is String) ? int.parse(id) : id;

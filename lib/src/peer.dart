@@ -117,7 +117,9 @@ class Peer implements Client, Server {
   // Shared methods.
 
   @override
-  Future listen() {
+  Future listen({
+    void Function(dynamic)? onNotification,
+  }) {
     _client.listen();
     _server.listen();
     _channel.stream.listen((message) {
