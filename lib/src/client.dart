@@ -206,9 +206,7 @@ class Client {
     if (!_isResponseValid(response)) return;
     if (response.containsKey('params')) {
       onNotification?.call(response['params']);
-    }
-    if (response.containsKey('result')) {
-      onNotification?.call(response['result']);
+      return;
     }
     var id = response['id'];
     id = (id is String) ? int.parse(id) : id;
