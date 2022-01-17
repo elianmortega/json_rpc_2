@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:json_rpc_2/src/sentry_adapter.dart';
 import 'package:stack_trace/stack_trace.dart';
 import 'package:stream_channel/stream_channel.dart';
 
@@ -15,7 +16,7 @@ import 'utils.dart';
 /// A client calls methods on a server and handles the server's responses to
 /// those method calls. Methods can be called with [sendRequest], or with
 /// [sendNotification] if no response is expected.
-class Client {
+class Client with SentryAdapter {
   final StreamChannel<dynamic> _channel;
 
   /// The next request id.
@@ -156,6 +157,8 @@ class Client {
     if (id != null) message['id'] = id.toString();
     if (parameters != null) message['params'] = parameters;
 
+    addSentryRequestBreadcrumb(message);
+
     if (_batch != null) {
       _batch!.add(message);
     } else {
@@ -190,6 +193,7 @@ class Client {
     response, [
     void Function(dynamic)? onNotification,
   ]) {
+    addSentryResponseBreadcrumb(response);
     if (response is List) {
       response.forEach((data) => _handleSingleResponse(data, onNotification));
     } else {

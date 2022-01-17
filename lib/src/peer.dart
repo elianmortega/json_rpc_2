@@ -104,6 +104,16 @@ class Peer implements Client, Server {
   @override
   void withBatch(Function() callback) => _client.withBatch(callback);
 
+  @override
+  void addSentryRequestBreadcrumb(Map<String, dynamic> message) {
+    _client.addSentryRequestBreadcrumb(message);
+  }
+
+  @override
+  void addSentryResponseBreadcrumb(Map<String, dynamic> message) {
+    _client.addSentryResponseBreadcrumb(message);
+  }
+
   // Server methods.
 
   @override
