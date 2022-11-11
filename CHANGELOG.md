@@ -1,3 +1,11 @@
+## 3.0.3-dev
+
+## 3.0.2
+
+* Switch to using `package:lints`.
+* Address a few analysis hint violations.
+* Populate the pubspec `repository` field.
+
 ## 3.0.1
 
 * Fix a bug where a `null` result to a request caused an exception.
